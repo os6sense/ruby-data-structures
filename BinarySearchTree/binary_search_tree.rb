@@ -72,20 +72,21 @@ end
 class BinarySearchTree
   def initialize(root=nil)
     @root = root
+    @NodeType = Node
   end
 
   def insert(key)
-    @root = Node.new(key) if @root.nil?
-    @root.insert(Node.new(key) )
+    @root = @NodeType.new(key) if @root.nil?
+    @root.insert(@NodeType.new(key) )
   end
 
   def delete(key)
-    node = @root.find(Node.new(key))
+    node = @root.find(@NodeType.new(key))
     node.delete unless node.nil?
   end
 
   def find(key)
-    return @root.find(Node.new(key)) if @root
+    return @root.find(@NodeType.new(key)) if @root
   end
 
   def traverse(order=:in_order)
