@@ -11,21 +11,22 @@ class IndexedNode  < Node
   # left_size is calculated on insert and causes all parent nodes
   # to recalculate their left_size.
   def insert(node)
-    _calc_left_size if super(node) 
+    # recalculate from the inserted nodes parent up
+    unless (tmp_node, tmp_parent = super(node)).nil?
+      tmp_parent._recalc_left_size(tmp_node, 1) 
+    end
   end
 
   # Need to recalculate left_size on deletion
   def delete
     # TODO: Does this work for all node types?
-    tmp_parent = @parent
+    parent._recalc_left_size(self, -1) if parent
     super
-    tmp_parent._calc_left_size if tmp_parent
   end
 
   # Given an index, return the node at that index. Aliased by []
-  # I STILL dont understand this fully.
   def rank(idx_rank)
-    puts "****#{idx_rank} #{left_size}, #{self.key}"
+#    puts "****#{idx_rank} #{left_size}, #{self.key}"
     return self if idx_rank == left_size
     return left.rank(idx_rank) if idx_rank < left_size
     return right.rank(idx_rank - left_size - 1) 
@@ -41,11 +42,9 @@ protected
 
   # calc left size is the TOTAL value of the number of nodes (both left and
   # right) to the left of the current node. 
-  def _calc_left_size
-    # TODO: ineffficient I can do better
-    @left_size = 0
-    left._traverse { @left_size +=1  } if left
-    parent._calc_left_size if parent
+  def _recalc_left_size(node, val)
+    @left_size += val if node == left
+    parent._recalc_left_size(self, val) if parent
   end
 end
 
