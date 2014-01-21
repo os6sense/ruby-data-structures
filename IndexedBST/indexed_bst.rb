@@ -19,14 +19,12 @@ class IndexedNode  < Node
 
   # Need to recalculate left_size on deletion
   def delete
-    # TODO: Does this work for all node types?
     parent._recalc_left_size(self, -1) if parent
     super
   end
 
   # Given an index, return the node at that index. Aliased by []
   def rank(idx_rank)
-#    puts "****#{idx_rank} #{left_size}, #{self.key}"
     return self if idx_rank == left_size
     return left.rank(idx_rank) if idx_rank < left_size
     return right.rank(idx_rank - left_size - 1) 
@@ -34,12 +32,6 @@ class IndexedNode  < Node
   alias [] rank
 
 protected
-  def _traverse &block
-    left._traverse(&block) if @left
-    yield self
-    right._traverse(&block) if @right 
-  end
-
   # calc left size is the TOTAL value of the number of nodes (both left and
   # right) to the left of the current node. 
   def _recalc_left_size(node, val)
