@@ -9,33 +9,28 @@ class Node
 
   def initialize(key)
     @key = key 
-    @height = 0
   end
 
   def <=>(other)
-    @key <=> other.key
+    key <=> other.key
   end
 
   # Returns: 
-  # nil if node was inserted 
-  # the existing node if it already exists 
   def insert(node)
     if node < self
-      return @left.insert(node) if @left
+      return left.insert(node) if left
       @left, @left.parent = node, self
     elsif node > self
-      return @right.insert(node) if @right
+      return right.insert(node) if right
       @right, @right.parent = node, self
-    else 
-      return self
     end
   end
 
   # Returns::
   def find(node)
-    return self if node == self
-    return @left.find(node) if @left and node < self
-    return @right.find(node) if @right and node > self
+    return left.find(node) if node < self && left
+    return right.find(node) if node > self && right
+    self if node == self
   end
 
   def delete
@@ -47,25 +42,27 @@ class Node
       self > parent ? 
         parent.right = left || right : parent.left = left || right 
     end
+
+    # Neccessary to avoid RGC leak since I still hold a reference parent?
+    @parent = nil if degree == 1 or degree == 0
     
-    left.largest.tap { | n | 
-      self.key = n.key; n.delete } if degree == 2
+    left.largest.tap { | n | @key = n.key; n.delete } if degree == 2
   end
 
   def is_leaf? 
-    @left.nil? && @right.nil?
+    left.nil? && right.nil?
   end
 
   def degree
-    (@left ? 1 : 0) + (@right ? 1 : 0)
+    (left ? 1 : 0) + (right ? 1 : 0)
   end
 
   def smallest
-    @left ? @left.smallest : self
+    left ? left.smallest : self
   end
 
   def largest
-    @right ? @right.largest : self
+    right ? right.largest : self
   end
 end
 
@@ -77,7 +74,7 @@ class BinarySearchTree
 
   def insert(key)
     @root = @NodeType.new(key) if @root.nil?
-    @root.insert(@NodeType.new(key) )
+    @root.insert( @NodeType.new(key) )
   end
 
   def delete(key)
@@ -90,12 +87,11 @@ class BinarySearchTree
   end
 
   def traverse(order=:in_order)
-    arr = []
-    method(order).call(@root) { | n | arr << n.key }
-    return arr
+    [].tap { |out| method(order).call(@root) { |node| out << node.key } }
   end
 
 protected
+
   def in_order(node, &block)
     return if node.nil?
     in_order(node.left, &block) 
@@ -116,7 +112,6 @@ protected
     post_order(node.right, &block) 
     yield node
   end
-
 end
 
 
