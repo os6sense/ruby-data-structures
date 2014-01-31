@@ -1,0 +1,7 @@
+source 'https://rubygems.org'
+
+group :development, :test do
+end
+
+  gem 'guard-rspec'
+  gem 'pry-byebug'
