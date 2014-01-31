@@ -6,9 +6,5 @@ end
 
 describe BinarySearchTree do
   it_behaves_like "binary_search_tree"
-
-  #describe :NodeType do
-    #it { described_class.NodeType.should eq Node}
-  #end
 end
 
